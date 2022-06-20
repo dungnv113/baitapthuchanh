@@ -1,0 +1,167 @@
+<html>
+
+<body>
+    <form id="form">
+        <input id="id">
+        <input id="name">
+        <input id="age">
+        
+        <button type="button" id="saveBtn" onclick="createPerson()">Save</button>
+        <button type="button" id="updateBtn"  style="display: none" onclick="updatePerson()">Update</button>
+
+    </form>
+    <table border="1">
+        <tr>
+            <td> ID</td>
+            <td> Name</td>
+            <td> Age</td>
+            <td> Option</td>
+        </tr>
+        <tbody id="tableBody"></tbody>
+    </table>
+
+    <script>
+        var dataStr = localStorage.getItem("data")
+        console.log(JSON.parse(dataStr))
+        var data = JSON.parse(dataStr) ||                  //convert tu string sang doi tuong js
+         [{ id: 1, name: "P1", age: 20 }, { id: 2, name: "P2", age: 22 }]
+        function drawTr(person) {
+            var tr = document.createElement("tr")
+            var tdId = document.createElement("td")
+            var tdName = document.createElement("td")
+            var tdAge = document.createElement("td")
+            var tdOption = document.createElement("td")
+
+            var btnDel = document.createElement("button")
+            var btnEdit = document.createElement("button")
+
+            btnDel.innerText = "Delete"
+            btnEdit.innerText = "Edit"
+
+
+
+           // bat su kien
+            btnDel.onclick = function(){
+                deletePerson(person.id)
+            }
+
+
+            btnEdit.onclick = function(){
+                editPerson(person.id)}
+
+            tdOption.appendChild(btnDel)
+            tdOption.appendChild(btnEdit)
+
+            tdId.innerHTML = person.id
+            tdName.innerHTML = person.name
+            tdAge.innerHTML = person.age
+
+            tr.appendChild(tdId)              //dùng append để gắn các phần tử của thẻ nhỏ bên trong thẻ to
+            tr.appendChild(tdName)
+            tr.appendChild(tdAge)
+            tr.appendChild(tdOption)
+            
+
+            var tableBody = document.getElementById("tableBody")
+            tableBody.appendChild(tr)
+        }
+
+        function resetDrawTable(persons) {
+            var tableBody = document.getElementById("tableBody")
+            tableBody.innerHTML = ""              //reset table body
+            for (var i = 0; i < persons.length; i++) {
+                drawTr(persons[i])
+            }
+        }
+
+
+        //init data
+        resetDrawTable(data)
+
+        setTimeout(()=> {
+            resetDrawTable(data)
+        },1000)
+
+        //viet doc du lieu tu form
+        function createPerson(){
+            var idInput = document.getElementById("id")
+            var nameInput = document.getElementById("name")
+            var ageInput = document.getElementById("age")
+            //var saveBtn = document.getElementById("saveBtn")
+            var id = idInput.value
+            var name = nameInput.value
+            var age = ageInput.value
+            
+
+            //validate du lieu
+            if(id.trim().length == 0 || name.trim().length == 0){
+                alert("Vui long nhap lieu")
+                return
+            }
+            //var p ={id:id, name:name}
+            //data.push(p)
+            data.push({id,name,age})
+            resetDrawTable(data)
+
+
+            //luu vao localStorage
+             //du lieu luu xuong la string, ko luu dc  doi tuong
+             //(convert 1 doi tuong js ve string ta dung ham stringify)
+             localStorage.setItem("data", JSON.stringify(data)    )   
+             document.getElementById("updateBtn").style.display = "block"
+           document.getElementById("saveBtn").style.display = "none"
+        }
+  
+
+        function deletePerson(id){
+             //p là biến đại diện cho phần tử trong data
+            // let index = data.findIndex(p => p.id == id);  
+            // data.splice(index,1)
+
+            // tạo mảng mới những person có id khác id cần xóa
+            var newData = data.filter(p => p.id !=id)   
+            data = newData
+            resetDrawTable(data)     
+            localStorage.setItem("data", JSON.stringify(data))
+            alert("Xoa thanh cong!!!")
+        }
+
+        function editPerson(id){
+          
+            let index = data.findIndex(p => p.id == id); 
+            let person = data[index];
+
+            // đổ dữ liệu lên Form
+            var idInput = document.getElementById("id")
+            var nameInput = document.getElementById("name")
+            var ageInput = document.getElementById("age")
+            idInput.value = person.id
+            nameInput.value = person.name
+            ageInput.value =person.age
+        }
+        function updatePerson(){
+            var idInput = document.getElementById("id")
+            var nameInput = document.getElementById("name")
+            var ageInput = document.getElementById("age")
+            var saveBtn = document.getElementById("saveBtn")
+            var id = idInput.value
+            var name = nameInput.value
+            var age = ageInput.value
+            
+            let index = data.findIndex(p => p.id == id); 
+           data[index] = {id,name,age}
+           resetDrawTable(data)
+           localStorage.setItem("data", JSON.stringify(data))
+           document.getElementById("updateBtn").style.display = "none"
+           document.getElementById("saveBtn").style.display = "block"
+        }
+
+        setInterval(()=>{
+            console.log(new Date())
+        },1000)                               //1s goi lai ham date 1 lan
+    </script>
+</body>
+
+
+
+</html>

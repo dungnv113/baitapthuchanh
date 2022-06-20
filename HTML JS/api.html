@@ -1,0 +1,236 @@
+<html>
+
+<head>
+    <title>CRUD Category</title>
+</head>
+
+<body>
+    <form>
+        <div id="" login-form>
+            <h1>LOGIN</h1>
+            <input type="text" id="username" placeholder="Nhap User">
+            <input type="text" id="password" placeholder="Nhap Password">
+            <button type="button" onclick="addCategory()">Login</button>
+        </div>
+    </form>
+
+    <form>
+        <div id="" login-form>
+            <h1>ADD</h1>
+            <input type="text" id="username" placeholder="Nhap Name">
+            <button type="button" onclick="login()">ADD</button>
+        </div>
+    </form>
+    <form id="form">
+        <input id="keyword" value="">
+        <button type="button" onclick="search()">Search</button>
+
+    </form>
+    <h1> Category </h1>
+    <div>
+        <select id="sizeElement" onchange="search()">
+            <option selected value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+
+        </select>
+        <button type="button" onclick="search(-1)">Previous</button>
+        <button type="button" onclick="search(1)">Next</button>
+    </div>
+    <div id="loadingDiv">LOADING...</div>
+    <table border="1">
+        <tr>
+            <td> ID</td>
+            <td> Name</td>
+        </tr>
+        <tbody id="tableBody"></tbody>
+    </table>
+</body>
+
+<script>
+    function drawTr(category) {
+        var tr = document.createElement("tr")
+        var tdId = document.createElement("td")
+        var tdName = document.createElement("td")
+        var tdOption = document.createElement("td")
+        var btnDel = document.createElement("button")
+        var btnEdit = document.createElement("button")
+
+        btnDel.innerText = "Delete"
+        btnEdit.innerText = "Edit"
+
+
+
+        // // bat su kien
+        btnDel.onclick = function () {
+            deletePerson(category.id)
+        }
+
+
+        // btnEdit.onclick = function () {
+        //     editcategory(category.id)
+        // }
+
+        tdOption.appendChild(btnDel)
+        tdOption.appendChild(btnEdit)
+
+        tdId.innerHTML = category.id
+        tdName.innerHTML = category.name
+
+
+        tr.appendChild(tdId)              //dùng append để gắn các phần tử của thẻ nhỏ bên trong thẻ to
+        tr.appendChild(tdName)
+        tr.appendChild(tdOption)
+
+
+        var tableBody = document.getElementById("tableBody")
+        tableBody.appendChild(tr)
+    }
+
+    function resetDrawTable(categories) {
+        var tableBody = document.getElementById("tableBody")
+        tableBody.innerHTML = ""              //reset table body
+        for (var i = 0; i < categories.length; i++) {
+            drawTr(categories[i])
+        }
+    }
+
+    let currentStart = 0;
+
+
+    async function search(n) {
+        let searchRequest = {
+            "start": 0,
+            "length": parseInt(document.getElementById('sizeElement').value),
+            "keyword": document.getElementById('keyword').value
+        }
+
+        if (n === undefined)
+            currentStart = 0              //reset nếu chọn lại số lượng size, và search
+
+        if (n == 1)
+            searchRequest.start = currentStart + searchRequest.length
+
+        if (n == -1)
+            searchRequest.start = currentStart - searchRequest.length
+
+        if (searchRequest.start < 0)
+            searchRequest.start = 0
+
+        //lưu lại start trang hiện tại
+        currentStart = searchRequest.start
+
+        document.getElementById("loadingDiv").style.display = "block"
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+
+        var raw = JSON.stringify(searchRequest);           //chuyen doi tuong ve string 
+
+        console.log(raw)
+
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        // fetch("http://54.150.115.104:8080/api/category/search", requestOptions)
+        //   .then(response => response.json())              //convert ket qua tra ve tu dang text json sang js
+        //   .then(result => console.log(result))            //result la kqua tra ve cua ham response
+        //   .catch(error => console.log('error', error));
+        try {
+            let response = await fetch("http://54.150.115.104:8080/api/category/search", requestOptions)
+            let result = await response.json();
+            console.log(result)
+            resetDrawTable(result.data)
+            document.getElementById("loadingDiv").style.display = "none"
+        }
+        catch (error) {
+            (console.log('error', error));
+            document.getElementById("loadingDiv").style.display = "none"
+        }
+    }
+
+    search()
+
+    function login() {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+        var urlencoded = new URLSearchParams();
+        urlencoded.append("username", document.getElementById("username").value);
+        urlencoded.append("password", document.getElementById("password").value);
+
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: urlencoded,
+            redirect: 'follow'
+        };
+
+        fetch("http://54.150.115.104:8080/api/login", requestOptions)
+            .then(response => response.json())
+            .then(result => {
+                console.log(result)
+                localStorage.setItem("accessToken", result.accessToken)
+            })
+            .catch(error => console.log('error', error));
+    }
+
+    let deletePerson = (id) => {
+        let accessToken = localStorage.getItem("accessToken")
+
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", `Bearer ${accessToken}`);                 //thay cho "BEAR" + accessToken ( chuoi + bien)
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+        var urlencoded = new URLSearchParams();
+        urlencoded.append("username", "0123456789");
+        urlencoded.append("password", "123456");
+
+        var requestOptions = {
+            method: 'DELETE',
+            headers: myHeaders,
+            body: urlencoded,
+            redirect: 'follow'
+        };
+
+        fetch(`http://54.150.115.104:8080/api/admin/category/delete?id=${id}`, requestOptions)
+            .then(response => {
+                alert("xoa thanh cong")
+                search()
+            })
+            .catch(error => console.log('error', error));
+    }
+
+    function addCategory() {
+        let accessToken = localStorage.getItem("accessToken")
+
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", `Bearer ${accessToken}`);                 //thay cho "BEAR" + accessToken ( chuoi + bien)
+        myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+        var raw = JSON.stringify({
+            "name": document.getElementById("cate-name").value
+        });
+
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        fetch("http://54.150.115.104:8080/api/admin/category/add", requestOptions)
+            .then(response => {
+                alert("them thanh cong")
+                search()
+            })
+            .catch(error => console.log('error', error));
+    }
+
+</script>
+
+</html>

@@ -1,0 +1,76 @@
+<script src="main.js"></script>
+<script src="ptb2.js"></script>
+<script src="cvhinhvuong.js"></script>
+<script>
+    ptb2(5, -2, 1)
+    ptb2(5, -4, 1)
+
+    try {
+        ptb2(undefined, -4, 1)
+    }
+    catch (e) {
+        console.log(e)
+    }
+
+    //String
+    var s = "Hello Jaavscript"
+
+    var s1 = s.substr(4, 12);
+    console.log(s1)
+    var s2 = s.substring(4, 12);
+    console.log(s2)
+
+    //doi tuong
+    var p1 = {
+        id: 1,
+        name: "P1",
+        hi: function () {
+            console.log("Hello" + this.name)
+        }
+    }
+    console.log(p1.name)
+    p1.hi()
+    console.log(p1)
+
+    var personArray = [
+        p1,
+        {
+            id: 2, name: "p2"
+        },
+        {
+            id: 3, name: "p2"
+        }
+
+    ]
+    var p3 = personArray[2];
+    p3.age = 30;
+    p3.info = function () {
+
+
+    }
+    delete p3.age
+    console.log(p3.age)
+    for (var prop in p3) {
+        console.log(prop)         // lấy tên thuộc tính bên trong p3
+        console.log(p3[prop])       //lấy giá trị thuộc tính bên trong p3
+
+    }
+
+    cvhv(3)
+    dthinhtron(4);
+    console.log(personA)
+    console.log(personA.name)
+
+
+    //callback
+    function callback(a, b, rs) {
+    int t = a + b;
+        rs(t);
+    }
+    var rs = function (data) {
+        console.log(data)
+    }
+    callback(1, 2, rs)
+
+    
+</script>

@@ -1,0 +1,102 @@
+<script>
+    //dung var co the khai bao lai
+    var x= 10; 
+     //dung let ko the khai bao lai       
+    let y = 20;        
+    //const ko gan dc gia tri moi,
+    // ko the gan p cho gia tri khac nhung co the thay doi tra tri trong p
+    const p = {                   
+        id:1, name: 'p'
+    }
+
+    //khai bao let trong for, ko anh huong gia tri let khai bao ben ngoai
+
+for(var i = 0; i < 5; i++){
+    var x = 40;
+    let y = 10;
+    console.log("x1" + x)
+    console.log("y1" + y)
+    setTimeout(() => {
+        console.log("i" + i)
+    }, 1000);
+}
+    console.log("x2" + x)
+    console.log("y2" + y)
+   
+
+    function count(){
+        let i = 0
+
+        function increase(x){
+            i+=x
+            console.log(i)
+        }
+        return increase
+    }
+
+    let dem = count();      //increase
+    dem(1); 
+    dem(1);
+    dem(1);
+    count()(3);
+     //goi ham
+
+
+
+     let promise = new Promise(function(ok,fail){
+        setTimeout(() => {
+            
+            setTimeout(() => {
+                //neu thanh cong
+                ok("SUCCESS")
+            },1000)
+        }, 1000);
+     })
+
+    //  cach 1:
+    //  function ok(s){
+    //     console.log(s)
+    //  }
+    //  function fail(s){
+    //     console.log(s)
+    //  }
+    //  promise.then(ok,fail)        //gia tri tra ve cua promise
+
+    //  cach 2:
+     promise.then ((s) =>{
+        console.log("OK" + s)
+        return "OKKKKK"
+     }).catch( (s) => {
+        console.log("FAIL" + s)
+        throw "FAILLLL"
+     }).then(
+        (data) =>{
+        console.log(data)
+     }).catch(
+        (data) =>{
+        console.log(data)
+    }
+     )
+
+//dung async trc function se tra ve promise
+     async function getData(){                                                 
+        return "OK";
+     }
+     
+     async function load(){
+
+     try{
+        let data = await getData()             //await dung ben trong ham async
+        console.log(data)
+     }catch(e){
+        console.log(e)
+     }
+   
+
+     }
+   
+</script> 
+
+
+
+
